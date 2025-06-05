@@ -1,0 +1,28 @@
+{
+  "name": "@mitsuharu/create-license-md",
+  "description": "It creates license markdown file from package.json",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "bin": {
+    "create-license-page": "src/index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "repository": "https://github.com/mitsuharu/create-license-md",
+  "author": "Mitsuharu Emoto <mthr1982@gmail.com> (https://github.com/mitsuharu)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mitsuharu/create-license-md/issues"
+  },
+  "homepage": "https://github.com/mitsuharu/create-license-md#readme",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "packageManager": "yarn@4.9.2",
+  "dependencies": {
+    "license-checker": "^25.0.1"
+  }
+}

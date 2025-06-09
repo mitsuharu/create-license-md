@@ -4,7 +4,14 @@ const fs = require("fs");
 const path = require("path");
 const checker = require("license-checker");
 
-const pkg = require(path.join(process.cwd(), "package.json"));
+let pkg = {};
+try {
+  const pkgPath = path.join(process.cwd(), "package.json");
+  pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
+} catch (err) {
+  console.error("❌ package.json の読み込みに失敗:", err.message);
+  process.exit(1);
+}
 const directDeps = Object.assign({}, pkg.dependencies, pkg.devDependencies);
 const outputPath = process.argv[2] || "licenses.md";
 

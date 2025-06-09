@@ -1,49 +1,62 @@
-#!/usr/bin/env node
+const fs = require('fs');
+const path = require('path');
+const pacote = require('pacote');
+const os = require('os');
 
-const fs = require("fs");
-const path = require("path");
-const checker = require("license-checker");
+const formatAuthor = author => {
+  if (typeof author === 'string') return author;
+  if (typeof author === 'object') return author.name || JSON.stringify(author);
+  return 'Unknown';
+};
 
-let pkg = {};
-try {
-  const pkgPath = path.join(process.cwd(), "package.json");
-  pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
-} catch (err) {
-  console.error("❌ package.json の読み込みに失敗:", err.message);
-  process.exit(1);
-}
-const directDeps = Object.assign({}, pkg.dependencies, pkg.devDependencies);
-const outputPath = process.argv[2] || "licenses.md";
-
-checker.init({ start: process.cwd(), json: true }, function (err, json) {
-  if (err) {
-    console.error("❌ ライセンス情報の取得に失敗:", err);
+const getLicenses = async (outputPath = 'licenses.md') => {
+  const packageJsonPath = path.resolve(process.cwd(), 'package.json');
+  
+  if (!fs.existsSync(packageJsonPath)) {
+    console.error('❌ Error: package.json not found in current directory.');
     process.exit(1);
   }
 
-  const markdownLines = ["# 使用パッケージのライセンス一覧\n"];
+  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
 
-  for (const key of Object.keys(json)) {
-    const [fullName, version] = key.match(/^(@?[^@]+)@(.+)$/).slice(1);
+  const allDeps = {
+    ...(packageJson.dependencies || {}),
+    ...(packageJson.devDependencies || {}),
+  };
 
-    // 直接依存のみ抽出
-    if (!(fullName in directDeps)) continue;
+  const sections = ["# Licenses\n"];
 
-    const info = json[key];
-    markdownLines.push(`## ${fullName}\n`);
-    markdownLines.push(`- Version: ${version}`);
-    if (info.publisher) {
-      markdownLines.push(`- Publisher: ${info.publisher}`);
+  for (const [pkgName, versionSpec] of Object.entries(allDeps)) {
+    try {
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), `${pkgName.replace('/', '_')}-`));
+      await pacote.extract(`${pkgName}@${versionSpec}`, tmpDir);
+      const pkgData = JSON.parse(fs.readFileSync(path.join(tmpDir, 'package.json'), 'utf-8'));
+
+      const lines = [
+        `## ${pkgName}\n`,
+        `- Version: ${pkgData.version || versionSpec}`,
+        `- License: ${pkgData.license || 'Unknown'}`,
+        `- Author: ${formatAuthor(pkgData.author)}`
+      ];
+      if (pkgData.repository?.url) {
+        lines.push(`- Repository: ${pkgData.repository.url}`);
+      }
+      if (pkgData.homepage) {
+        lines.push(`- Homepage: ${pkgData.homepage}`);
+      }
+
+      const section = lines.join('\n');
+      sections.push(section + "\n");
+    } catch (err) {
+      console.warn(`⚠️ Failed to fetch ${pkgName}: ${err.message}`);
     }
-    if (info.licenses) {
-      markdownLines.push(`- License: ${info.licenses}`);
-    }
-    if (info.repository) {
-      markdownLines.push(`- Repository: ${info.repository}`);
-    }
-    markdownLines.push(``);
   }
 
-  fs.writeFileSync(outputPath, markdownLines.join("\n"));
-  console.log(`✅ ${outputPath} を生成しました！`);
-});
+  const markdown = sections.join('\n');
+  fs.writeFileSync(outputPath, markdown, 'utf-8');
+  console.log(`✅ License info written to: ${outputPath}`);
+};
+
+// CLI引数から出力パス取得
+const outputPathArg = process.argv[2];
+getLicenses(outputPathArg || 'licenses.md');

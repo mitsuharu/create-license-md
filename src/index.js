@@ -23,19 +23,18 @@ checker.init({ start: process.cwd(), json: true }, function (err, json) {
     if (!(fullName in directDeps)) continue;
 
     const info = json[key];
-    markdownLines.push(`## ${fullName}`);
-    markdownLines.push(`- バージョン: ${version}`);
-
+    markdownLines.push(`## ${fullName}\n`);
+    markdownLines.push(`- Version: ${version}`);
+    if (info.publisher) {
+      markdownLines.push(`- Author: ${info.publisher}`);
+    }
     if (info.licenses) {
-      markdownLines.push(`- ライセンス: ${info.licenses}`);
+      markdownLines.push(`- License: ${info.licenses}`);
     }
     if (info.repository) {
-      markdownLines.push(`- リポジトリ: ${info.repository}`);
+      markdownLines.push(`- Repository: ${info.repository}`);
     }
-    if (info.publisher) {
-      markdownLines.push(`- 著作権: ${info.publisher}`);
-    }
-    markdownLines.push("\n---\n");
+    markdownLines.push(``);
   }
 
   fs.writeFileSync(outputPath, markdownLines.join("\n"));

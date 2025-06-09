@@ -24,5 +24,8 @@
   "packageManager": "yarn@4.9.2",
   "dependencies": {
     "pacote": "^21.0.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4"
   }
 }

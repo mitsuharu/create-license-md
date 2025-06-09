@@ -10,6 +10,8 @@ __metadata:
   resolution: "@mitsuharu/create-license-md@workspace:."
   dependencies:
     license-checker: "npm:^25.0.1"
+  bin:
+    create-license-page: src/index.js
   languageName: unknown
   linkType: soft
 

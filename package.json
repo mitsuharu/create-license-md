@@ -23,6 +23,6 @@
   },
   "packageManager": "yarn@4.9.2",
   "dependencies": {
-    "license-checker": "^25.0.1"
+    "pacote": "^21.0.0"
   }
 }

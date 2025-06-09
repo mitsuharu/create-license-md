@@ -33,7 +33,7 @@ checker.init({ start: process.cwd(), json: true }, function (err, json) {
     markdownLines.push(`## ${fullName}\n`);
     markdownLines.push(`- Version: ${version}`);
     if (info.publisher) {
-      markdownLines.push(`- Author: ${info.publisher}`);
+      markdownLines.push(`- Publisher: ${info.publisher}`);
     }
     if (info.licenses) {
       markdownLines.push(`- License: ${info.licenses}`);

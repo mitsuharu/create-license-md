@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-const fs = require('fs')
-const path = require('path')
+const fs = require('node:fs')
+const path = require('node:path')
 const pacote = require('pacote')
-const os = require('os')
+const os = require('node:os')
 
 const formatAuthor = (author) => {
 	if (typeof author === 'string') return author
@@ -50,8 +50,8 @@ const getLicenses = async (outputPath = 'licenses.md') => {
 				lines.push(`- Homepage: ${pkgData.homepage}`)
 			}
 
-			const section = lines.join('\n')
-			sections.push(section + '\n')
+			const section = `${lines.join('\n')}\n`
+			sections.push(section)
 		} catch (err) {
 			console.warn(`⚠️ Failed to fetch ${pkgName}: ${err.message}`)
 		}
